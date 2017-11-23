@@ -24,7 +24,7 @@ MyBGSubtractorColor::MyBGSubtractorColor(VideoCapture vc) {
 	means = vector<Scalar>(max_samples);
 	
 	h_low = 12;
-        h_up = 7;
+    h_up = 7;
 	l_low = 30;
 	l_up = 40;
 	s_low = 80;
@@ -100,7 +100,9 @@ void MyBGSubtractorColor::LearnModel() {
         // Obtener las regiones de interés y calcular la media de cada una de ellas
         // almacenar las medias en la variable means
         // ...
-	
+    
+        Mat acc(frame.rows,frame.cols,CV_8UC1,Scalar(0));
+        
         destroyWindow("Cubre los cuadrados con la mano y pulsa espacio");
 
 }
