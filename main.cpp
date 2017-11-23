@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 		//flip(frame, frame, 1);
 		if (frame.empty())
 		{
-			printf("Leído frame vacío\n");
+			printf("Le’do frame vacío\n");
 			continue;
 		}
 		int c = cvWaitKey(40);
