@@ -48,10 +48,16 @@ int main(int argc, char** argv)
 	namedWindow("Fondo");
 
         // creamos el objeto para la substracción de fondo
-	
+
+	MyBGSubtractorColor substraer(cap);
+
 	// creamos el objeto para el reconocimiento de gestos
 
+	HandGesture reconocimiento;
+
 	// iniciamos el proceso de obtención del modelo del fondo
+
+	substraer.LearnModel();
 	
 
 	for (;;)
@@ -60,17 +66,22 @@ int main(int argc, char** argv)
 		//flip(frame, frame, 1);
 		if (frame.empty())
 		{
-			printf("Le’do frame vacío\n");
+			printf("Leído frame vacío\n");
 			continue;
 		}
 		int c = cvWaitKey(40);
 		if ((char)c == 'q') break;
 
 		// obtenemos la máscara del fondo con el frame actual
+	    
+		substraer.ObtainBGMask(frame,frame);
                 
                 // CODIGO 2.1
                 // limpiar la máscara del fondo de ruido
                 //...
+		/*Mat element=getStructuringElement(MORPH_RECT,Size(2*dilation_size+1),Point(dilation_size,dilation_size));
+		erode(frame,frame,element);
+		dilate(frame,frame,element);*/
 
 
 		// deteccion de las características de la mano
