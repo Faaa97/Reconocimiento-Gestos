@@ -82,8 +82,8 @@ int main(int argc, char** argv)
 		/* Mat element=getStructuringElement(MORPH_RECT,Size(2*dilation_size+1),Point(dilation_size,dilation_size));
 		erode(frame,frame,element);
 		dilate(frame,frame,element); */
-		medianBlur(bgmask,bgmash,5);
-		erode
+		medianBlur(bgmask,bgmask,5);
+		
 
 		// deteccion de las características de la mano
 
