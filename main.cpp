@@ -75,6 +75,7 @@ int main(int argc, char** argv)
 		// obtenemos la máscara del fondo con el frame actual
 	    
 		substraer.ObtainBGMask(frame,frame);
+        reconocimiento.FeaturesDetection(frame,frame);
                 
                 // CODIGO 2.1
                 // limpiar la máscara del fondo de ruido
