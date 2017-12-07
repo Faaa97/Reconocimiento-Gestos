@@ -74,8 +74,7 @@ int main(int argc, char** argv)
 
 		// obtenemos la máscara del fondo con el frame actual
 	    
-		substraer.ObtainBGMask(frame,frame);
-                
+		substraer.ObtainBGMask(frame,bgmask);
                 // CODIGO 2.1
                 // limpiar la máscara del fondo de ruido
                 //...
@@ -83,6 +82,7 @@ int main(int argc, char** argv)
 		erode(frame,frame,element);
 		dilate(frame,frame,element); */
 		medianBlur(bgmask,bgmask,5);
+        reconocimiento.FeaturesDetection(bgmask,frame);
 		
 
 		// deteccion de las características de la mano
