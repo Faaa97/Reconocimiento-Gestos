@@ -23,12 +23,12 @@ MyBGSubtractorColor::MyBGSubtractorColor(VideoCapture vc) {
 	upper_bounds = vector<Scalar>(max_samples);
 	means = vector<Scalar>(max_samples);
 	
-	h_low = 12;
-        h_up = 7;
-	l_low = 30;
-	l_up = 40;
-	s_low = 80;
-	s_up = 80;
+	h_low = 23;
+        h_up = 0;
+	l_low = 26;
+	l_up = 41;
+	s_low = 29;
+	s_up = 30;
 
 	
 	namedWindow("Trackbars");
@@ -74,9 +74,9 @@ void MyBGSubtractorColor::LearnModel() {
 
 	for (;;) {
 		
-		flip(frame, frame, 1);
+		flip(frame, frame, 1); //Gira la imágen (efecto espejo).
 		
-		frame.copyTo(tmp_frame);
+		frame.copyTo(tmp_frame);   //copia la matriz a otra
 
 		//dibujar los cuadrados
 		
@@ -99,7 +99,16 @@ void MyBGSubtractorColor::LearnModel() {
         // CODIGO 1.1
         // Obtener las regiones de interés y calcular la media de cada una de ellas
         // almacenar las medias en la variable means
-        // ...
+
+	cvtColor(frame,hls_frame,CV_BGR2HLS);
+	Scalar media;
+
+	for(int i=0;i<max_samples;i++) {
+
+	   Mat roi=frame(Rect(samples_positions[i].x,samples_positions[i].y,SAMPLE_SIZE,SAMPLE_SIZE));
+	   media=mean(roi);
+	   means[i]=media;
+	}
 	
         destroyWindow("Cubre los cuadrados con la mano y pulsa espacio");
 
@@ -110,6 +119,66 @@ void  MyBGSubtractorColor::ObtainBGMask(cv::Mat frame, cv::Mat &bgmask) {
         // Definir los rangos máximos y mínimos para cada canal (HLS) 
         // umbralizar las imágenes para cada rango y sumarlas para
         // obtener la máscara final con el fondo eliminado
-        //...
-	
+
+	//cvtColor(frame,frame,CV_BGR2HLS);
+	Mat tmp_bgmask(frame.rows,frame.cols,CV_8UC1,Scalar(0));
+	Mat aux;
+
+	for(int i=0;i<max_samples;i++) {
+	   
+	   if(means[i][0]-h_low<0)
+		lower_bounds[i][0]=0;
+	   else
+	   	lower_bounds[i][0]=means[i][0]-h_low;
+	   
+	   if(means[i][1]-l_low<0)
+		lower_bounds[i][1]=0;
+	   else
+	   	lower_bounds[i][1]=means[i][1]-l_low;
+	   
+	   if(means[i][2]-s_low<0)
+		lower_bounds[i][2]=0;
+	   else
+		lower_bounds[i][2]=means[i][2]-s_low;
+   
+	   if(means[i][0]+h_up>255)
+		upper_bounds[i][0]=255;
+	   else
+		upper_bounds[i][0]=means[i][0]+h_up;
+	   
+	   if(means[i][1]+l_up>255)
+		upper_bounds[i][1]=255;
+	   else
+                upper_bounds[i][1]=means[i][1]+l_up;
+	   
+	   if(means[i][2]+s_up>255)
+		upper_bounds[i][2]=255;
+	   else
+		upper_bounds[i][2]=means[i][2]+s_up;
+
+	   inRange(frame,lower_bounds[i],upper_bounds[i],aux);
+	   tmp_bgmask+=aux;
+	}
+	tmp_bgmask.copyTo(bgmask);	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
