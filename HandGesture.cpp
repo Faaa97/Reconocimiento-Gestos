@@ -84,6 +84,7 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
                         // CODIGO 3.2
                         // filtrar y mostrar los defectos de convexidad
                         //...
+            circle(output_img, f, 5, Scalar(0, 255, 0), 3);
 
                 }
 	
