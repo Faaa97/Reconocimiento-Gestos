@@ -80,7 +80,7 @@ int main(int argc, char** argv)
                 // limpiar la máscara del fondo de ruido
                 //...
 		int dilation_size = 5;
-		Mat element = getStructuringElement(MORPH_RECT,Size(2*dilation_size+1),Point(dilation_size,dilation_size));
+		Mat element = getStructuringElement(MORPH_RECT,Size(2*dilation_size+1,2*dilation_size+1),Point(dilation_size,dilation_size));
 		erode(frame,frame,element);
 		dilate(frame,frame,element);
 		medianBlur(bgmask,bgmask,5);
