@@ -86,8 +86,7 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
                         //...
             if (angle < 90 && depth > 100)
                  circle(output_img, f, 5, Scalar(0, 255, 0), 3);
-
-                }
+        }
 	
 		
 }

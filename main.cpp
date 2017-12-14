@@ -18,7 +18,7 @@ using namespace cv;
 int main(int argc, char** argv)
 {
 
-	Mat frame, bgmask, out_frame;
+	Mat frame, raw_frame, bgmask, out_frame;
 	
 
 
@@ -34,7 +34,8 @@ int main(int argc, char** argv)
         int cont = 0;
         while (frame.empty()&& cont < 2000 ) {
 
-                cap >> frame;
+                cap >> raw_frame;
+                flip(raw_frame, frame, 1);
                 ++cont;
         }
         if (cont >= 2000) {
@@ -62,8 +63,8 @@ int main(int argc, char** argv)
 
 	for (;;)
 	{
-		cap >> frame;
-		//flip(frame, frame, 1);
+        cap >> raw_frame;
+        flip(raw_frame, frame, 1);
 		if (frame.empty())
 		{
 			printf("Leído frame vacío\n");
