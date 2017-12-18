@@ -45,14 +45,18 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
         // detección del contorno de la mano y selección del contorno más largo
         //...
     findContours(temp_mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+    vector<Rect> boundRect(contours.size());
     index=0;
     for (int i=1; i<contours.size(); i++)
     {
         if(contours[i].size()>contours[index].size())
             index=i;
+        boundRect[i] = boundingRect(Mat(contours[i]));
+        rectangle(output_img,boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 2);
     }
         // pintar el contorno
         //...
+    //putText(output_img, to_string(boundRect[index].area()), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
     drawContours(output_img, contours, index, cv::Scalar(255, 0, 0), 2, 8, vector<Vec4i>(), 0, Point());
 
 	//obtener el convex hull	
@@ -84,9 +88,19 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
                         // CODIGO 3.2
                         // filtrar y mostrar los defectos de convexidad
                         //...
-            if (angle < 90 && depth > 100)
-                 circle(output_img, f, 5, Scalar(0, 255, 0), 3);
+            if (angle < 92 && depth > 100)
+            {
+                cont++;
+                circle(output_img, f, 5, Scalar(0, 255, 0), 3);
+            }
         }
+        if (cont!=0)
+            putText(output_img, to_string(cont+1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+        else
+            if (boundRect[index].area()>110000)
+                putText(output_img, to_string(1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+            else
+                putText(output_img, to_string(0), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
 	
 		
 }
