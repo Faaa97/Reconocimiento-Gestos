@@ -23,13 +23,12 @@ MyBGSubtractorColor::MyBGSubtractorColor(VideoCapture vc) {
 	upper_bounds = vector<Scalar>(max_samples);
 	means = vector<Scalar>(max_samples);
 	
-	h_low = 23;
-        h_up = 0;
-	l_low = 26;
-	l_up = 41;
-	s_low = 29;
-	s_up = 30;
-
+	h_low = 80;
+    h_up = 100;
+	l_low = 100;
+	l_up = 21;
+	s_low = 99;
+	s_up = 100;
 	
 	namedWindow("Trackbars");
 
@@ -105,7 +104,7 @@ void MyBGSubtractorColor::LearnModel() {
 
 	for(int i=0;i<max_samples;i++) {
 
-	   Mat roi=frame(Rect(samples_positions[i].x,samples_positions[i].y,SAMPLE_SIZE,SAMPLE_SIZE));
+	   Mat roi=hls_frame(Rect(samples_positions[i].x,samples_positions[i].y,SAMPLE_SIZE,SAMPLE_SIZE));
 	   media=mean(roi);
 	   means[i]=media;
 	}
@@ -120,10 +119,12 @@ void  MyBGSubtractorColor::ObtainBGMask(cv::Mat frame, cv::Mat &bgmask) {
         // umbralizar las imágenes para cada rango y sumarlas para
         // obtener la máscara final con el fondo eliminado
 
-	//cvtColor(frame,frame,CV_BGR2HLS);
+    Mat hls_frame;
+    cvtColor(frame,hls_frame,CV_BGR2HLS);
 	Mat tmp_bgmask(frame.rows,frame.cols,CV_8UC1,Scalar(0));
 	Mat aux;
-
+    //bgmask.setTo(Scalar(0));
+    
 	for(int i=0;i<max_samples;i++) {
 	   
 	   if(means[i][0]-h_low<0)
@@ -156,7 +157,7 @@ void  MyBGSubtractorColor::ObtainBGMask(cv::Mat frame, cv::Mat &bgmask) {
 	   else
 		upper_bounds[i][2]=means[i][2]+s_up;
 
-	   inRange(frame,lower_bounds[i],upper_bounds[i],aux);
+	   inRange(hls_frame,lower_bounds[i],upper_bounds[i],aux);
 	   tmp_bgmask+=aux;
 	}
 	tmp_bgmask.copyTo(bgmask);	

@@ -18,7 +18,7 @@ using namespace cv;
 int main(int argc, char** argv)
 {
 
-	Mat frame, bgmask, out_frame;
+	Mat frame, raw_frame, bgmask, out_frame;
 	
 
 
@@ -34,7 +34,8 @@ int main(int argc, char** argv)
         int cont = 0;
         while (frame.empty()&& cont < 2000 ) {
 
-                cap >> frame;
+                cap >> raw_frame;
+                flip(raw_frame, frame, 1);
                 ++cont;
         }
         if (cont >= 2000) {
@@ -62,8 +63,8 @@ int main(int argc, char** argv)
 
 	for (;;)
 	{
-		cap >> frame;
-		//flip(frame, frame, 1);
+        cap >> raw_frame;
+        flip(raw_frame, frame, 1);
 		if (frame.empty())
 		{
 			printf("Leído frame vacío\n");
@@ -78,10 +79,13 @@ int main(int argc, char** argv)
                 // CODIGO 2.1
                 // limpiar la máscara del fondo de ruido
                 //...
-		/* Mat element=getStructuringElement(MORPH_RECT,Size(2*dilation_size+1),Point(dilation_size,dilation_size));
-		erode(frame,frame,element);
-		dilate(frame,frame,element); */
-		medianBlur(bgmask,bgmask,5);
+        medianBlur(bgmask,bgmask,15);
+        Mat element=getStructuringElement(MORPH_RECT,Size(2*15,2*15),Point(15,15));
+        /*int dilation_size=1;
+		Mat element=getStructuringElement(MORPH_RECT,Size(2*dilation_size+1,2*dilation_size+1),Point(dilation_size,dilation_size));
+        //erode(bgmask,bgmask,element);
+        dilate(bgmask,bgmask,element);*/
+		
         reconocimiento.FeaturesDetection(bgmask,frame);
 		
 
@@ -92,6 +96,7 @@ int main(int argc, char** argv)
                 // mostramos el resultado del reconocimento de gestos
 
 		imshow("Reconocimiento", frame);
+        imshow("Fondo", bgmask);
 
 		
 	}
