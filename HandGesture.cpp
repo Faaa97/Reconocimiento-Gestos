@@ -45,7 +45,6 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
         // detección del contorno de la mano y selección del contorno más largo
         //...
     findContours(temp_mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-    //vector<Rect> boundRect(contours.size());
     Rect boundRect;
 
     for(int i = 0; i < linea.size(); i++)
@@ -55,51 +54,37 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
     {
         if(contours[i].size()>contours[index].size())
             index=i;
-        //boundRect[i] = boundingRect(Mat(contours[i]));
-        //rectangle(output_img,boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 2);
     }
     if(contours.size() > index){
         boundRect = boundingRect(Mat(contours[index]));
         rectangle(output_img,boundRect.tl(), boundRect.br(), Scalar(0, 255, 0), 2);
     }
-    cout << "index: " << index << "\n";
-    cout << "contours[size]: " << contours.size() << "\n";
+        
         // pintar el contorno
         //...
-    //putText(output_img, to_string(boundRect[index].area()), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
     drawContours(output_img, contours, index, cv::Scalar(255, 0, 0), 2, 8, vector<Vec4i>(), 0, Point());
 
 	//obtener el convex hull	
 	vector<int> hull;
     if(contours.size() > index)
 	    convexHull(contours[index],hull);
-    else{
-        cout << "No se pudo realizar convexHull\n";
-        cout << "size = " << contours.size() <<"\n";
+    else
         return;
-    } 
 	
 	// pintar el convex hull    
     Point pt0;
     if(contours[index].size() >  hull[hull.size()-1])
 	    pt0 = contours[index][hull[hull.size()-1]];
-    else{
-        cout << "No se pudo realizar pintar convex Hull\n";
-        cout << "size = " << contours[index].size() <<"\n";
+    else
         return;
-    }
         
 	for (int i = 0; i < hull.size(); i++)
 	{
         Point pt;
         if(contours.size() > index && contours[index].size() > hull[i])
 		    pt = contours[index][hull[i]];
-        else{
-            cout << "No se pudo realizar pt\n";
-            cout << "size conteous = " << contours.size() <<"\n";
-            cout << "size contours[index]= " << contours[index].size() <<"\n";
+        else
             return;
-        }
 		line(output_img, pt0, pt, Scalar(0, 0, 255), 2, CV_AA);
 		pt0 = pt;
 	}
@@ -108,11 +93,8 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 	vector<Vec4i> defects;
     if(contours.size() > index)
 	    convexityDefects(contours[index], hull  , defects);
-    else{
-        cout << "No se pudo realizar obtener defectos de convexidad\n";
-        cout << "size = " << contours.size() <<"\n";
+    else
         return;
-    }
 		
 	Point latest;
 	int cont = 0;
@@ -138,8 +120,7 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
         linea.push_back(latest);
 
     putText(output_img, to_string(boundRect.area()), Point(output_img.cols/2,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
-    /*else
-        cout << "No se pudo dibujar el rectángulo\n";*/
+
     if (cont!=0)
         putText(output_img, to_string(cont+1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
     else
