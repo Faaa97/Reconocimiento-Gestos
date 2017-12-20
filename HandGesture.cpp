@@ -47,6 +47,9 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
     findContours(temp_mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
     //vector<Rect> boundRect(contours.size());
     Rect boundRect;
+
+    for(int i = 0; i < linea.size(); i++)
+        circle(output_img, linea[i], 2, Scalar(0, 255, 255), 8);
     
     for (int i=1; i<contours.size(); i++)
     {
@@ -55,8 +58,10 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
         //boundRect[i] = boundingRect(Mat(contours[i]));
         //rectangle(output_img,boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 2);
     }
-    boundRect = boundingRect(Mat(contours[index]));
-    rectangle(output_img,boundRect.tl(), boundRect.br(), Scalar(0, 255, 0), 2);
+    if(contours.size() > index){
+        boundRect = boundingRect(Mat(contours[index]));
+        rectangle(output_img,boundRect.tl(), boundRect.br(), Scalar(0, 255, 0), 2);
+    }
     cout << "index: " << index << "\n";
     cout << "contours[size]: " << contours.size() << "\n";
         // pintar el contorno
@@ -74,7 +79,7 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
         return;
     } 
 	
-	// pintar el convex hull
+	// pintar el convex hull    
     Point pt0;
     if(contours[index].size() >  hull[hull.size()-1])
 	    pt0 = contours[index][hull[hull.size()-1]];
@@ -109,41 +114,37 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
         return;
     }
 		
-		
-		int cont = 0;
-		for (int i = 0; i < defects.size(); i++) {
-            /*if(contours.size() > index && contours[index].size() > defects[i][0] && contours[index].size() > defects[i][1] && contours[index].size() > defects[i][2] && contours[index].size() > defects[i][3]){*/
-			    Point s = contours[index][defects[i][0]];
-			    Point e = contours[index][defects[i][1]];
-			    Point f = contours[index][defects[i][2]];
-			    float depth = (float)defects[i][3] / 256.0;
-			    double angle = getAngle(s, e, f);
-		
-                            // CODIGO 3.2
-                            // filtrar y mostrar los defectos de convexidad
-                            //...
-                if (angle < 92 && depth > 100)
-                {
-                    cont++;
-                    circle(output_img, f, 5, Scalar(0, 255, 0), 3);
-                }
-          /*  }
-            else{
-                cout << "No se pudo realizar for defects\n";
-                //cout << "size = " << contours.size() <<"\n";
-                return;
-            }*/
-        }
+	Point latest;
+	int cont = 0;
+	for (int i = 0; i < defects.size(); i++) {
+		    Point s = contours[index][defects[i][0]];
+		    Point e = contours[index][defects[i][1]];
+		    Point f = contours[index][defects[i][2]];
+		    float depth = (float)defects[i][3] / 256.0;
+		    double angle = getAngle(s, e, f);
+	
+                        // CODIGO 3.2
+                        // filtrar y mostrar los defectos de convexidad
+                        //...
+            if (angle < 92 && depth > 100)
+            {
+                cont++;
+                circle(output_img, f, 5, Scalar(0, 255, 0), 3);
+                if(cont == 1)
+                    latest = f;
+            }
+    }
+    if(cont == 1)
+        linea.push_back(latest);
 
-        //if(bound > index)
-        putText(output_img, to_string(boundRect.area()), Point(output_img.cols/2,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
-        /*else
-            cout << "No se pudo dibujar el rectángulo\n";*/
-        if (cont!=0)
-            putText(output_img, to_string(cont+1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+    putText(output_img, to_string(boundRect.area()), Point(output_img.cols/2,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+    /*else
+        cout << "No se pudo dibujar el rectángulo\n";*/
+    if (cont!=0)
+        putText(output_img, to_string(cont+1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+    else
+        if (boundRect.area()>80000)
+            putText(output_img, to_string(1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
         else
-            if (boundRect.area()>80000)
-                putText(output_img, to_string(1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
-            else
-                putText(output_img, to_string(0), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+            putText(output_img, to_string(0), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
 }

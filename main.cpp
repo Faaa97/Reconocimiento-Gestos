@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	//Abrimos la webcam
 
 	VideoCapture cap;
-	cap.open(0);
+	cap.open(1);
 	if (!cap.isOpened())
 	{
 		printf("\nNo se puede abrir la cámara\n");
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 
 	substraer.LearnModel();
 	
-
+    
 	for (;;)
 	{
         cap >> raw_frame;
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
                 // limpiar la máscara del fondo de ruido
                 //...
         medianBlur(bgmask,bgmask,5);
-        Mat element=getStructuringElement(MORPH_RECT,Size(2*15,2*15),Point(15,15));
+        //Mat element=getStructuringElement(MORPH_RECT,Size(2*15,2*15),Point(15,15));
         /*int dilation_size=1;
 		Mat element=getStructuringElement(MORPH_RECT,Size(2*dilation_size+1,2*dilation_size+1),Point(dilation_size,dilation_size));
         //erode(bgmask,bgmask,element);

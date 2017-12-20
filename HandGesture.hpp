@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <string>
+#include <vector>
 
 class HandGesture {
 
@@ -19,6 +20,6 @@ public:
 private:
 	double getAngle(cv::Point s, cv::Point e, cv::Point f);
 	
-	
+	std::vector<cv::Point> linea;
 
 };
