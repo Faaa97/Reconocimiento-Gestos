@@ -1,6 +1,6 @@
 CCX=g++
 
-CXXFLAGS= -g
+CXXFLAGS= -g -std=c++0x
 
 
 OPENCV= `pkg-config --cflags opencv` `pkg-config --libs opencv`

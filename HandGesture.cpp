@@ -39,47 +39,108 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 	vector<vector<Point> > contours;
 	Mat temp_mask;
 	mask.copyTo(temp_mask);
-	int index = -1;
+	int index = 0;
 
         // CODIGO 3.1
         // detección del contorno de la mano y selección del contorno más largo
         //...
-
+    findContours(temp_mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+    vector<Rect> boundRect(contours.size());
+    
+    for (int i=1; i<contours.size(); i++)
+    {
+        if(contours[i].size()>contours[index].size())
+            index=i;
+        boundRect[i] = boundingRect(Mat(contours[i]));
+        rectangle(output_img,boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 2);
+    }
+    cout << "index: " << index << "\n";
+    cout << "contours[size]: " << contours.size() << "\n";
         // pintar el contorno
         //...
-	
+    //putText(output_img, to_string(boundRect[index].area()), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+    drawContours(output_img, contours, index, cv::Scalar(255, 0, 0), 2, 8, vector<Vec4i>(), 0, Point());
 
 	//obtener el convex hull	
 	vector<int> hull;
-	convexHull(contours[index],hull);
+    if(contours.size() > index)
+	    convexHull(contours[index],hull);
+    else{
+        cout << "No se pudo realizar convexHull\n";
+        cout << "size = " << contours.size() <<"\n";
+        return;
+    } 
 	
 	// pintar el convex hull
-	Point pt0 = contours[index][hull[hull.size()-1]];
+    Point pt0;
+    if(contours[index].size() >  hull[hull.size()-1])
+	    pt0 = contours[index][hull[hull.size()-1]];
+    else{
+        cout << "No se pudo realizar pintar convex Hull\n";
+        cout << "size = " << contours[index].size() <<"\n";
+        return;
+    }
+        
 	for (int i = 0; i < hull.size(); i++)
 	{
-		Point pt = contours[index][hull[i]];
+        Point pt;
+        if(contours.size() > index && contours[index].size() > hull[i])
+		    pt = contours[index][hull[i]];
+        else{
+            cout << "No se pudo realizar pt\n";
+            cout << "size conteous = " << contours.size() <<"\n";
+            cout << "size contours[index]= " << contours[index].size() <<"\n";
+            return;
+        }
 		line(output_img, pt0, pt, Scalar(0, 0, 255), 2, CV_AA);
 		pt0 = pt;
 	}
 	
         //obtener los defectos de convexidad
 	vector<Vec4i> defects;
-	convexityDefects(contours[index], hull, defects);
+    if(contours.size() > index)
+	    convexityDefects(contours[index], hull  , defects);
+    else{
+        cout << "No se pudo realizar obtener defectos de convexidad\n";
+        cout << "size = " << contours.size() <<"\n";
+        return;
+    }
 		
 		
 		int cont = 0;
 		for (int i = 0; i < defects.size(); i++) {
-			Point s = contours[index][defects[i][0]];
-			Point e = contours[index][defects[i][1]];
-			Point f = contours[index][defects[i][2]];
-			float depth = (float)defects[i][3] / 256.0;
-			double angle = getAngle(s, e, f);
+            /*if(contours.size() > index && contours[index].size() > defects[i][0] && contours[index].size() > defects[i][1] && contours[index].size() > defects[i][2] && contours[index].size() > defects[i][3]){*/
+			    Point s = contours[index][defects[i][0]];
+			    Point e = contours[index][defects[i][1]];
+			    Point f = contours[index][defects[i][2]];
+			    float depth = (float)defects[i][3] / 256.0;
+			    double angle = getAngle(s, e, f);
 		
-                        // CODIGO 3.2
-                        // filtrar y mostrar los defectos de convexidad
-                        //...
-
+                            // CODIGO 3.2
+                            // filtrar y mostrar los defectos de convexidad
+                            //...
+                if (angle < 92 && depth > 100)
+                {
+                    cont++;
+                    circle(output_img, f, 5, Scalar(0, 255, 0), 3);
                 }
-	
-		
+          /*  }
+            else{
+                cout << "No se pudo realizar for defects\n";
+                //cout << "size = " << contours.size() <<"\n";
+                return;
+            }*/
+        }
+
+        if(boundRect.size() > index)
+        putText(output_img, to_string(boundRect[index].area()), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+        else
+            cout << "No se pudo dibujar el rectángulo\n";
+        /*if (cont!=0)
+            putText(output_img, to_string(cont+1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+        else
+            if (boundRect[index].area()>110000)
+                putText(output_img, to_string(1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+            else
+                putText(output_img, to_string(0), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));*/
 }
