@@ -45,15 +45,18 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
         // detección del contorno de la mano y selección del contorno más largo
         //...
     findContours(temp_mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-    vector<Rect> boundRect(contours.size());
+    //vector<Rect> boundRect(contours.size());
+    Rect boundRect;
     
     for (int i=1; i<contours.size(); i++)
     {
         if(contours[i].size()>contours[index].size())
             index=i;
-        boundRect[i] = boundingRect(Mat(contours[i]));
-        rectangle(output_img,boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 2);
+        //boundRect[i] = boundingRect(Mat(contours[i]));
+        //rectangle(output_img,boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 2);
     }
+    boundRect = boundingRect(Mat(contours[index]));
+    rectangle(output_img,boundRect.tl(), boundRect.br(), Scalar(0, 255, 0), 2);
     cout << "index: " << index << "\n";
     cout << "contours[size]: " << contours.size() << "\n";
         // pintar el contorno
@@ -132,15 +135,15 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
             }*/
         }
 
-        if(boundRect.size() > index)
-        putText(output_img, to_string(boundRect[index].area()), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
-        else
-            cout << "No se pudo dibujar el rectángulo\n";
-        /*if (cont!=0)
+        //if(bound > index)
+        putText(output_img, to_string(boundRect.area()), Point(output_img.cols/2,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
+        /*else
+            cout << "No se pudo dibujar el rectángulo\n";*/
+        if (cont!=0)
             putText(output_img, to_string(cont+1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
         else
-            if (boundRect[index].area()>110000)
+            if (boundRect.area()>80000)
                 putText(output_img, to_string(1), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
             else
-                putText(output_img, to_string(0), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));*/
+                putText(output_img, to_string(0), Point(0,output_img.rows), FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Scalar(255,255,255));
 }

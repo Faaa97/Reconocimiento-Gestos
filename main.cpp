@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	//Abrimos la webcam
 
 	VideoCapture cap;
-	cap.open(1);
+	cap.open(0);
 	if (!cap.isOpened())
 	{
 		printf("\nNo se puede abrir la cámara\n");
